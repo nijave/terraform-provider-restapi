@@ -22,6 +22,15 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      # The provider tests (terraform-plugin-testing) require the Terraform CLI
+      # on PATH. Without it they try to auto-install, which fails signature
+      # verification ("openpgp: key expired") due to HashiCorp's rotated key.
+      # Pre-installing Terraform lets the tests use it directly.
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
+          terraform_wrapper: false
       - name: Build
         run: go build ./...
       - name: Vet
